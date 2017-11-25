@@ -1,0 +1,45 @@
+bin_PROGRAMS += bench/bench_ausbit
+BENCH_SRCDIR = bench
+BENCH_BINARY = bench/bench_ausbit$(EXEEXT)
+
+
+bench_bench_ausbit_SOURCES = \
+  bench/bench_ausbit.cpp \
+  bench/bench.cpp \
+  bench/bench.h \
+  bench/Examples.cpp
+
+bench_bench_ausbit_CPPFLAGS = $(AM_CPPFLAGS) $(AUSBIT_INCLUDES) $(EVENT_CLFAGS) $(EVENT_PTHREADS_CFLAGS) -I$(builddir)/bench/
+bench_bench_ausbit_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+bench_bench_ausbit_LDADD = \
+  $(LIBAUSBIT_SERVER) \
+  $(LIBAUSBIT_COMMON) \
+  $(LIBAUSBIT_UNIVALUE) \
+  $(LIBAUSBIT_UTIL) \
+  $(LIBAUSBIT_CRYPTO) \
+  $(LIBLEVELDB) \
+  $(LIBMEMENV) \
+  $(LIBSECP256K1)
+
+if ENABLE_ZMQ
+bench_bench_ausbit_LDADD += $(LIBAUSBIT_ZMQ) $(ZMQ_LIBS)
+endif
+
+if ENABLE_WALLET
+bench_bench_ausbit_LDADD += $(LIBAUSBIT_WALLET)
+endif
+
+bench_bench_ausbit_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
+bench_bench_ausbit_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+
+CLEAN_AUSBIT_BENCH = bench/*.gcda bench/*.gcno
+
+CLEANFILES += $(CLEAN_AUSBIT_BENCH)
+
+ausbit_bench: $(BENCH_BINARY)
+
+bench: $(BENCH_BINARY) FORCE
+	$(BENCH_BINARY)
+
+ausbit_bench_clean : FORCE
+	rm -f $(CLEAN_AUSBIT_BENCH) $(bench_bench_ausbit_OBJECTS) $(BENCH_BINARY)

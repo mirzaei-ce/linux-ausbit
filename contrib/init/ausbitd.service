@@ -1,0 +1,22 @@
+[Unit]
+Description=Ausbit's distributed currency daemon
+After=network.target
+
+[Service]
+User=ausbit
+Group=ausbit
+
+Type=forking
+PIDFile=/var/lib/ausbitd/ausbitd.pid
+ExecStart=/usr/bin/ausbitd -daemon -pid=/var/lib/ausbitd/ausbitd.pid \
+-conf=/etc/ausbit/ausbit.conf -datadir=/var/lib/ausbitd -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

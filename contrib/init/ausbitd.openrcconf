@@ -1,0 +1,33 @@
+# /etc/conf.d/ausbitd: config file for /etc/init.d/ausbitd
+
+# Config file location
+#AUSBITD_CONFIGFILE="/etc/ausbit/ausbit.conf"
+
+# What directory to write pidfile to?  (created and owned by $AUSBITD_USER)
+#AUSBITD_PIDDIR="/var/run/ausbitd"
+
+# What filename to give the pidfile
+#AUSBITD_PIDFILE="${AUSBITD_PIDDIR}/ausbitd.pid"
+
+# Where to write ausbitd data (be mindful that the blockchain is large)
+#AUSBITD_DATADIR="/var/lib/ausbitd"
+
+# User and group to own ausbitd process
+#AUSBITD_USER="ausbit"
+#AUSBITD_GROUP="ausbit"
+
+# Path to ausbitd executable
+#AUSBITD_BIN="/usr/bin/ausbitd"
+
+# Nice value to run ausbitd under
+#AUSBITD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+AUSBITD_OPTS="-disablewallet"
+
+# The timeout in seconds OpenRC will wait for ausbitd to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+AUSBITD_SIGTERM_TIMEOUT=60

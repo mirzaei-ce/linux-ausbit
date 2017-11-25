@@ -1,0 +1,92 @@
+#!/sbin/runscript
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/ausbit/.ausbit" ]; then
+	AUSBITD_DEFAULT_DATADIR="/var/lib/ausbit/.ausbit"
+else
+	AUSBITD_DEFAULT_DATADIR="/var/lib/ausbitd"
+fi
+
+AUSBITD_CONFIGFILE=${AUSBITD_CONFIGFILE:-/etc/ausbit/ausbit.conf}
+AUSBITD_PIDDIR=${AUSBITD_PIDDIR:-/var/run/ausbitd}
+AUSBITD_PIDFILE=${AUSBITD_PIDFILE:-${AUSBITD_PIDDIR}/ausbitd.pid}
+AUSBITD_DATADIR=${AUSBITD_DATADIR:-${AUSBITD_DEFAULT_DATADIR}}
+AUSBITD_USER=${AUSBITD_USER:-${AUSBIT_USER:-ausbit}}
+AUSBITD_GROUP=${AUSBITD_GROUP:-ausbit}
+AUSBITD_BIN=${AUSBITD_BIN:-/usr/bin/ausbitd}
+AUSBITD_NICE=${AUSBITD_NICE:-${NICELEVEL:-0}}
+AUSBITD_OPTS="${AUSBITD_OPTS:-${AUSBIT_OPTS}}"
+
+name="Ausbit Core Daemon"
+description="Ausbit cryptocurrency P2P network daemon"
+
+command="/usr/bin/ausbitd"
+command_args="-pid=\"${AUSBITD_PIDFILE}\" \
+		-conf=\"${AUSBITD_CONFIGFILE}\" \
+		-datadir=\"${AUSBITD_DATADIR}\" \
+		-daemon \
+		${AUSBITD_OPTS}"
+
+required_files="${AUSBITD_CONFIGFILE}"
+start_stop_daemon_args="-u ${AUSBITD_USER} \
+			-N ${AUSBITD_NICE} -w 2000"
+pidfile="${AUSBITD_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${AUSBITD_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${AUSBITD_USER}:${AUSBITD_GROUP}" \
+	"${AUSBITD_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${AUSBITD_USER}:${AUSBITD_GROUP}" \
+	"${AUSBITD_PIDDIR}"
+
+	checkpath -f \
+	-o ${AUSBITD_USER}:${AUSBITD_GROUP} \
+	-m 0660 \
+	${AUSBITD_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${AUSBITD_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run ausbitd."
+		eerror "The setting must appear in ${AUSBITD_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following"
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is also recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"Ausbit Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}

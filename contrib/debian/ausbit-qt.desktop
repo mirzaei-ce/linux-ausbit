@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Ausbit
+Comment=Ausbit P2P Cryptocurrency
+Comment[fr]=Ausbit, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Ausbit, eşten eşe kriptografik sanal para birimi
+Exec=ausbit-qt %u
+Terminal=false
+Type=Application
+Icon=ausbit128
+MimeType=x-scheme-handler/ausbit;
+Categories=Office;Finance;

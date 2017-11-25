@@ -1,0 +1,5 @@
+Building Ausbit
+
+See doc/build-*.md for instructions on building ausbitd,
+the intended-for-services, no-graphical-interface, reference
+implementation of Ausbit.

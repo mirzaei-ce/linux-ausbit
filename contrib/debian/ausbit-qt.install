@@ -1,0 +1,6 @@
+usr/local/bin/ausbit-qt usr/bin
+share/pixmaps/ausbit32.xpm usr/share/pixmaps
+share/pixmaps/ausbit16.xpm usr/share/pixmaps
+share/pixmaps/ausbit128.png usr/share/pixmaps
+debian/ausbit-qt.desktop usr/share/applications
+debian/ausbit-qt.protocol usr/share/kde4/services/
